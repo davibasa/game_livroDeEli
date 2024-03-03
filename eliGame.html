@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Livro de Eli: The Game!</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.23.0/dist/phaser.js"></script>
+    <script src="scenes/gameScreen.js"></script>
+    <script src="scenes/initialScreen.js"></script>
+
+    <style>
+        body {
+            margin-top: 1px;
+            padding: 0;
+        }
+
+        canvas {
+            border: 1px solid #000000;
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="game"></div>
+
+    <script type="text/javascript">
+        /*Global variables definition*/
+        const config = {
+            type: Phaser.AUTO,
+            scale: {
+                mode: Phaser.Scale.FIT
+            },
+            autoCenter: Phaser.Scale.CENTER,
+            width: 1920, //largura da tela do jogo
+            height: 885, //altura da tela do jogo
+            backgroundColor: '#39addd',
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 30 },
+                    debug: false 
+                }
+            },
+            parent: "game",
+            dom:{
+               createContainer: true,
+            },
+            scene: [InitialScreen, GameScreen]
+        };
+        
+        var game = new Phaser.Game(config);
+        game.scene.start('InitialScreen');
+    </script>
+</body>
+</html>
