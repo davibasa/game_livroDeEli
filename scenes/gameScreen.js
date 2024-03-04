@@ -201,19 +201,7 @@ class GameScreen extends Phaser.Scene {
         // Lógica de movimentação e pulo do jogador
         this.gameControls.cursors = this.input.keyboard.createCursorKeys();
 
-        if (this.gameControls.cursors.left.isDown && this.gameControls.cursors.up.isDown)
-        {
-            this.player.obj.setVelocityX(-160);
-            
-            this.player.obj.anims.play('leftUp', true);
-        }
-        else if (this.gameControls.cursors.right.isDown && this.gameControls.cursors.up.isDown)
-        {
-            this.player.obj.setVelocityX(160);
-            
-            this.player.obj.anims.play('rightUp', true);
-        }
-        else if (this.gameControls.cursors.left.isDown)
+        if (this.gameControls.cursors.left.isDown)
         {
             this.player.obj.setVelocityX(-160);
 
