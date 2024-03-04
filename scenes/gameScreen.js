@@ -7,6 +7,7 @@ class GameScreen extends Phaser.Scene {
     livros;
     espinhos;
     fogos;
+    listaNovosFogos = [];
 
     // Construtor da cena
     constructor() {
@@ -20,8 +21,8 @@ class GameScreen extends Phaser.Scene {
     init() {
         // 1) JOGADOR
         this.player = {
-            width: 64,
-            height: 96,
+            width: 48,
+            height: 80,
             obj: null // Objeto do jogador
         };
 
@@ -42,11 +43,11 @@ class GameScreen extends Phaser.Scene {
         this.load.image("livro", "assets/livro.png"); 
         this.load.image("plataforma", "assets/plataforma.png"); 
         this.load.image("bigorna", "assets/bigorna.png"); 
-        this.load.image("fogo", "assets/fogo.png"); 
         this.load.image("espinho", "assets/espinho.png"); 
         this.load.image("restart", "assets/reset_bt.png"); 
         this.load.image("gameWin", "assets/gameWin.png"); 
         this.load.image("gameOver", "assets/gameOver.png"); 
+        this.load.spritesheet("fogo", "assets/fogo.png", { frameWidth: 64 , frameHeight: 62 }); 
         this.load.spritesheet("eli", "assets/eli.png", { frameWidth: this.player.width, frameHeight: this.player.height }); 
     }
 
@@ -66,6 +67,7 @@ class GameScreen extends Phaser.Scene {
             if (this.gameControls.over) {
                 this.gameControls.over = false;
                 this.gameControls.score = 0;
+                this.listaNovosFogos.length = 0;
                 this.scene.restart();
             }
         }, this);
@@ -78,7 +80,7 @@ class GameScreen extends Phaser.Scene {
         // Criação das plataformas, itens e colisões
         this.plataformas = this.physics.add.staticGroup();
         this.espinhos = this.physics.add.staticGroup();
-        this.fogos = this.physics.add.staticGroup();
+        this.fogos = this.physics.add.group();
         this.bigornas = this.physics.add.group();
 
         // Criação de plataformas
@@ -88,7 +90,14 @@ class GameScreen extends Phaser.Scene {
 
         // Criação de plataformas e fogos
         Array(6).fill().map((_, index) => {
-            index % 2 != 0 ? this.fogos.create(1300 - 140 * index, 630, "fogo") : console.log("deu certo");
+            let fogo;
+            if(index % 2 != 0)
+            {
+                this.listaNovosFogos.push(this.fogos.create(1300 - 140 * index, 647, "fogo"));
+                /*
+                fogo = this.fogos.create(1300 - 140 * index, 647, "fogo");
+                this.fogos.add(fogo)*/
+            }
             this.plataformas.create(1300 - 155 * index, 700, 'plataforma');
         });
 
@@ -99,8 +108,14 @@ class GameScreen extends Phaser.Scene {
             index % 2 != 0 ? this.plataformas.create(1400 - 155 * index, 380, 'plataforma') : console.log("deu certo");
         });
 
+        //this.fogos.create(1600, 485, "fogo");
+        
+        //Adição de barreiras
+        this.listaNovosFogos.push(this.fogos.create(1600, 495, "fogo"));
+        this.listaNovosFogos.forEach((fogo) => this.fogos.add(fogo));
+        this.espinhos.create(300, 500, "espinho")
+
         // Criação de outras plataformas
-        this.fogos.create(1600, 485, "fogo");
         this.plataformas.create(1550, 555, 'plataforma');
         this.plataformas.create(1705, 555, 'plataforma');
         this.plataformas.create(1527.5, 245, 'plataforma');
@@ -112,6 +127,7 @@ class GameScreen extends Phaser.Scene {
 
         // Criação de grupo de bigornas
         this.physics.add.collider(this.bigornas, this.plataformas);
+        this.physics.add.collider(this.fogos, this.plataformas);
         this.physics.add.collider(this.player.obj, this.bigornas, this.hitItem, null, this);
         this.physics.add.collider(this.player.obj, this.espinhos, this.hitItem, null, this);
         this.physics.add.collider(this.player.obj, this.fogos, this.hitItem, null, this);
@@ -145,18 +161,31 @@ class GameScreen extends Phaser.Scene {
             repeat: -1
         });
 
+        this.anims.create({
+            key: 'fogo',
+            frames: this.anims.generateFrameNumbers('fogo', { start: 0, end: 3 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
         // Criação de livros
         this.livros = this.physics.add.group({
             key: 'livro',
-            repeat: 6,
-            setXY: { x: 50, y: 0, stepX: 280 },
+            repeat: 15,
+            setXY: { x: 50, y: 0, stepX: 155 },
         });
         
         // Configuração do comportamento dos livros
         this.livros.children.iterate(function (child) {
             child.setBounceY(Phaser.Math.FloatBetween(0.6, 0.8));
         });
-        
+      
+        //Configuração do comportamento dos fogos
+        this.fogos.children.iterate(function(fogo) {
+            fogo.anims.play('fogo');
+        });
+
+
         // Adição de colisores
         this.physics.add.collider(this.player.obj, this.espinhos);
         this.physics.add.collider(this.player.obj, this.fogos);
@@ -205,7 +234,7 @@ class GameScreen extends Phaser.Scene {
 
         if (this.gameControls.cursors.up.isDown && this.player.obj.body.touching.down)
         {
-            this.player.obj.setVelocityY(-330);
+            this.player.obj.setVelocityY(-500);
         }
     }
 
